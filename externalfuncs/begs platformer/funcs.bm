@@ -1,0 +1,95 @@
+'This file will store functions.
+
+Sub RotoZoom (X As Long, Y As Long, Image As Long, Scale As Single, Rotation As Single)
+    Dim px(3) As long: Dim py(3) As long
+    W& = _Width(Image&): H& = _Height(Image&)
+    px(0) = -W& / 2: py(0) = -H& / 2: px(1) = -W& / 2: py(1) = H& / 2
+    px(2) = W& / 2: py(2) = H& / 2: px(3) = W& / 2: py(3) = -H& / 2
+    sinr! = Sin(-Rotation / 57.2957795131): cosr! = Cos(-Rotation / 57.2957795131)
+    For i& = 0 To 3
+        x2& = (px(i&) * cosr! + sinr! * py(i&)) * Scale + X: y2& = (py(i&) * cosr! - px(i&) * sinr!) * Scale + Y
+        px(i&) = x2&: py(i&) = y2&
+    Next
+    _MapTriangle (0, 0)-(0, H& - 1)-(W& - 1, H& - 1), Image& To(px(0), py(0))-(px(1), py(1))-(px(2), py(2))
+    _MapTriangle (0, 0)-(W& - 1, 0)-(W& - 1, H& - 1), Image& To(px(0), py(0))-(px(3), py(3))-(px(2), py(2))
+End Sub
+
+Sub Angle2Vector (Angle!, xv!, yv!)
+    xv! = Sin(Angle! * PIDIV180)
+    yv! = -Cos(Angle! * PIDIV180)
+End Sub
+
+
+Function ATan2 (y As Single, x As Single)
+    Dim AtanResult As Single
+    If x = 0 Then
+        If y > 0 Then
+            AtanResult = PI / 2
+        ElseIf y < 0 Then
+            AtanResult = -PI / 2
+        Else
+            AtanResult = 0
+        End If
+    Else
+        AtanResult = Atn(y / x)
+        If x < 0 Then
+            If y >= 0 Then AtanResult = AtanResult + PI
+        Else AtanResult = AtanResult - PI
+        End If
+    End If
+    ATan2 = AtanResult
+End Function
+
+Function MapsCollide (Rect1 As Entity, Rect2 As MAP)
+    MapsCollide = 0
+    If Rect1.x2 >= Rect2.x1 Then
+        If Rect1.x1 <= Rect2.x2 Then
+            If Rect1.y2 >= Rect2.y1 Then
+                If Rect1.y1 <= Rect2.y2 Then
+                    MapsCollide = -1
+                End If
+            End If
+        End If
+    End If
+End Function
+
+
+Function TriggerCollide (Rect1 As Entity, Rect2 As Trigger)
+    TriggerCollide = 0
+    If Rect1.x2 >= Rect2.x1 Then
+        If Rect1.x1 <= Rect2.x2 Then
+            If Rect1.y2 >= Rect2.y1 Then
+                If Rect1.y1 <= Rect2.y2 Then
+                    TriggerCollide = -1
+                End If
+            End If
+        End If
+    End If
+End Function
+
+Function ParticleCollide (Rect1 As Particle, Rect2 As Map)
+    ParticleCollide = 0
+    If Rect1.x + 3 >= Rect2.x1 Then
+        If Rect1.x -3 <= Rect2.x2 Then
+            If Rect1.y + 3 >= Rect2.y1 Then
+                If Rect1.y -3 <= Rect2.y2 Then
+                    ParticleCollide = -1
+                End If
+            End If
+        End If
+    End If
+End Function
+
+
+Function EntsCollide (Rect1 As Entity, Rect2 As Entity)
+    EntsCollide = 0
+    If Rect1.x2 >= Rect2.x1 Then
+        If Rect1.x1 <= Rect2.x2 Then
+            If Rect1.y2 >= Rect2.y1 Then
+                If Rect1.y1 <= Rect2.y2 Then
+                    EntsCollide = -1
+                End If
+            End If
+        End If
+    End If
+End Function
